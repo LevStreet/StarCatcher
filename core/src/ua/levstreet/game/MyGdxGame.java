@@ -16,8 +16,10 @@ public class MyGdxGame extends ApplicationAdapter {
 	private final int WIDTH = 800;
 	private final int HEIGHT = 480;
 	private Vector3 touchPos = new Vector3();
+	private Vector3 grabbedPos = new Vector3();
 	private BitmapFont bitmapFont;
 	private Star star;
+	private boolean grabbed;
 
 	@Override
 	public void create() {
@@ -27,6 +29,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		touchPos.set(WIDTH / 2, HEIGHT / 2, 0);
 		bitmapFont = new BitmapFont();
 		star = new Star(WIDTH / 2, HEIGHT / 2, 50, 50);
+		star.setBoundary(0, 0, WIDTH, HEIGHT);
 	}
 
 	@Override
@@ -36,8 +39,17 @@ public class MyGdxGame extends ApplicationAdapter {
 		if (Gdx.input.isTouched()) {
 			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 			camera.unproject(touchPos);
-			star.setPosition(touchPos.x - star.getWidth() / 2, touchPos.y
-					- star.getHeight() / 2);
+			if (!grabbed
+					&& star.getRectangle().contains(touchPos.x, touchPos.y)) {
+				grabbed = true;
+				grabbedPos.set(touchPos);
+			}
+		} else {
+			grabbed = false;
+		}
+		if (grabbed) {
+			star.setDirection(touchPos.x - grabbedPos.x, touchPos.y
+					- grabbedPos.y);
 		}
 		camera.update();
 		batch.setProjectionMatrix(camera.combined);
