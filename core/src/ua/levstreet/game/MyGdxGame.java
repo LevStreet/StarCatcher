@@ -9,13 +9,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
 public class MyGdxGame extends ApplicationAdapter {
 	private final int WIDTH = 800;
 	private final int HEIGHT = 480;
 	private final int NUMBER_OF_STARS = 10;
-	private final int FLOW_WIDTH = 100;
+	private final int FLOW_WIDTH = 150;
 	private final int STAR_WIDTH = 50;
 	private final int STAR_HEIGHT = 50;
 	private OrthographicCamera camera;
@@ -34,10 +35,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		touchPos.set(WIDTH / 2, HEIGHT / 2, 0);
 		bitmapFont = new BitmapFont();
 		for (int i = 0; i < NUMBER_OF_STARS; i++) {
-			stars[i] = new Star(MathUtils.random(0, FLOW_WIDTH), HEIGHT
-					+ MathUtils.random(0, 500), STAR_WIDTH, STAR_HEIGHT);
-			stars[i].setBoundary(0, 0, WIDTH, HEIGHT);
-			stars[i].setDirection(0, -MathUtils.random(10, 100));
+			stars[i] = new Star();
+			putInFlow(stars[i]);
 		}
 	}
 
@@ -70,16 +69,24 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch.begin();
 		for (Star star : stars) {
 			if (star.getState() == Star.State.DEAD) {
-				star.getRectangle().x = MathUtils.random(0, FLOW_WIDTH);
-				star.getRectangle().y = HEIGHT + MathUtils.random(0, 500);
-				star.setDirection(0, -MathUtils.random(10, 100));
-				star.setState(Star.State.IN_FLOW);
+				putInFlow(star);
 			}
 			star.draw(batch);
 		}
 		String fps = "FPS: " + Gdx.graphics.getFramesPerSecond();
 		bitmapFont.draw(batch, fps, 0, HEIGHT - bitmapFont.getXHeight());
 		batch.end();
+	}
+
+	private void putInFlow(Star star) {
+		Rectangle rectangle = star.getRectangle();
+		rectangle.x = MathUtils.random(0, FLOW_WIDTH);
+		rectangle.y = HEIGHT + MathUtils.random(0, 500);
+		rectangle.width = STAR_WIDTH;
+		rectangle.height = STAR_HEIGHT;
+		star.setDirection(0, -MathUtils.random(10, 100));
+		star.setBoundary(FLOW_WIDTH, 0, WIDTH, HEIGHT);
+		star.setState(Star.State.IN_FLOW);
 	}
 
 	@Override
