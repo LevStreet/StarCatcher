@@ -104,8 +104,10 @@ public class GameScreen extends InputAdapter implements Screen {
 		for (Actor actor : stage.getActors()) {
 			if (StarActor.class.isInstance(actor)) {
 				StarActor star = (StarActor) actor;
-				if (star.getRight() < 0 || star.getX() > WIDTH
-						|| star.getTop() < 0 || star.getY() > HEIGHT) {
+				Body bodyB = mouseJointDef.bodyB;
+				if ((star.getRight() < 0 || star.getX() > WIDTH
+						|| star.getTop() < 0 || star.getY() > HEIGHT)
+						&& star.getBody() != bodyB) {
 					stage.getRoot().removeActor(actor);
 					starPool.free(star);
 				}
