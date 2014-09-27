@@ -18,7 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.utils.Pool.Poolable;
 
 public class StarActor extends Actor implements Poolable {
-	private static float RADIUS = .2f;
+	private static float RADIUS = .25f;
 	private Texture texture;
 	private World world;
 	private Body body;
@@ -50,7 +50,7 @@ public class StarActor extends Actor implements Poolable {
 		fixtureDef.shape = circleShape;
 		fixtureDef.restitution = .3f;
 		fixtureDef.density = 1f;
-		fixtureDef.friction = .1f;
+		fixtureDef.friction = 1;
 		body.createFixture(fixtureDef);
 		circleShape.dispose();
 	}

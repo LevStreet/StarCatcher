@@ -1,5 +1,6 @@
 package ua.levstreet.game;
 
+import ua.levstreet.game.actor.DebugInfo;
 import ua.levstreet.game.actor.StarActor;
 
 import com.badlogic.gdx.Gdx;
@@ -45,11 +46,14 @@ public class GameScreen extends InputAdapter implements Screen {
 	private MouseJoint mouseJoint;
 	private Vector2 touchCoordinates = new Vector2();
 	private long sinceLastStar = System.nanoTime();
+	private DebugInfo debugInfo;
 
 	public GameScreen(StarCatcher starCatcher) {
 		this.starCatcher = starCatcher;
 		stage = new Stage(new FitViewport(WIDTH, HEIGHT));
 		bitmapFont = new BitmapFont();
+		bitmapFont.setUseIntegerPositions(false);
+		bitmapFont.setScale(.02f);
 		world = new World(new Vector2(0, 0), true);
 		debugRenderer = new Box2DDebugRenderer();
 		createWalls(WIDTH, HEIGHT);
@@ -57,6 +61,8 @@ public class GameScreen extends InputAdapter implements Screen {
 		mouseJointDef.bodyA = walls;
 		mouseJointDef.maxForce = 100500;
 		mouseJointDef.collideConnected = false;
+		debugInfo = new DebugInfo(bitmapFont);
+		stage.getRoot().addActorAt(100500, debugInfo);
 	}
 
 	private void createWalls(float width, float height) {
@@ -96,24 +102,25 @@ public class GameScreen extends InputAdapter implements Screen {
 		}
 		stage.act(delta);
 		for (Actor actor : stage.getActors()) {
-			StarActor star = (StarActor) actor;
-			if (star.getRight() < 0 || star.getX() > WIDTH || star.getTop() < 0
-					|| star.getY() > HEIGHT) {
-				stage.getRoot().removeActor(actor);
-				starPool.free(star);
+			if (StarActor.class.isInstance(actor)) {
+				StarActor star = (StarActor) actor;
+				if (star.getRight() < 0 || star.getX() > WIDTH
+						|| star.getTop() < 0 || star.getY() > HEIGHT) {
+					stage.getRoot().removeActor(actor);
+					starPool.free(star);
+				}
 			}
 		}
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		stage.draw();
-//		debugRenderer.render(world, stage.getCamera().combined);
+		// debugRenderer.render(world, stage.getCamera().combined);
 		world.step(Gdx.graphics.getDeltaTime(), 8, 3); // TODO
 	}
 
 	@Override
 	public void resize(int width, int height) {
 		stage.getViewport().update(width, height, true);
-		Gdx.app.log("resize", WIDTH + " " + WIDTH * height / width);
 	}
 
 	@Override
@@ -140,13 +147,13 @@ public class GameScreen extends InputAdapter implements Screen {
 		world.QueryAABB(new QueryCallback() {
 			@Override
 			public boolean reportFixture(Fixture fixture) {
-				if (fixture.testPoint(touchCoordinates)) {
-					mouseJointDef.bodyB = fixture.getBody();
-					mouseJointDef.target.set(touchCoordinates);
-					mouseJoint = (MouseJoint) world.createJoint(mouseJointDef);
-					return false;
-				}
-				return true;
+				// if (fixture.testPoint(touchCoordinates)) {
+				mouseJointDef.bodyB = fixture.getBody();
+				mouseJointDef.target.set(touchCoordinates);
+				mouseJoint = (MouseJoint) world.createJoint(mouseJointDef);
+				return false;
+				// }
+				// return true;
 			}
 		}, touchCoordinates.x, touchCoordinates.y, touchCoordinates.x,
 				touchCoordinates.y);
