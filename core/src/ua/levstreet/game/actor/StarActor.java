@@ -48,7 +48,7 @@ public class StarActor extends Actor implements Poolable {
 		circleShape.setRadius(RADIUS);
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = circleShape;
-		fixtureDef.restitution = .3f;
+		fixtureDef.restitution = .4f;
 		fixtureDef.density = 1f;
 		fixtureDef.friction = 1;
 		body.createFixture(fixtureDef);

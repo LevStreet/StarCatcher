@@ -28,8 +28,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 public class GameScreen extends InputAdapter implements Screen {
 	private final int WIDTH = 10;
 	private final float HEIGHT = WIDTH * 1080 / 1920;
-	private final int FLOW_WIDTH = 2;
+	private final int FLOW_WIDTH = 1;
 	private final int STAR_EVERY = 500000000;
+	private final int TOUCH_STOP = 2;
 	private StarCatcher starCatcher;
 	private Stage stage;
 	private BitmapFont bitmapFont;
@@ -73,10 +74,10 @@ public class GameScreen extends InputAdapter implements Screen {
 		walls = world.createBody(bodyDef);
 		ChainShape chainShape = new ChainShape();
 		float offset = .0f;
-		float[] vertices = { 0 + FLOW_WIDTH + offset, 0 + offset,
+		float[] vertices = { 0 + TOUCH_STOP + offset, 0 + offset,
 				width - offset, 0 + offset, width - offset, height - offset,
-				0 + FLOW_WIDTH + offset, height - offset,
-				0 + FLOW_WIDTH + offset, 0 + offset };
+				0 + TOUCH_STOP + offset, height - offset,
+				0 + TOUCH_STOP + offset, 0 + offset };
 		chainShape.createChain(vertices);
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = chainShape;
@@ -116,7 +117,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		stage.draw();
-		// debugRenderer.render(world, stage.getCamera().combined);
+		debugRenderer.render(world, stage.getCamera().combined);
 		world.step(Gdx.graphics.getDeltaTime(), 8, 3); // TODO
 	}
 
@@ -146,6 +147,9 @@ public class GameScreen extends InputAdapter implements Screen {
 		touchCoordinates.x = screenX;
 		touchCoordinates.y = screenY;
 		stage.screenToStageCoordinates(touchCoordinates);
+		if (touchCoordinates.x > TOUCH_STOP) {
+			return false;
+		}
 		world.QueryAABB(new QueryCallback() {
 			@Override
 			public boolean reportFixture(Fixture fixture) {
@@ -175,7 +179,13 @@ public class GameScreen extends InputAdapter implements Screen {
 		touchCoordinates.y = screenY;
 		stage.screenToStageCoordinates(touchCoordinates);
 		if (mouseJoint != null) {
-			mouseJoint.setTarget(touchCoordinates);
+			if (mouseJointDef.bodyB.getPosition().x > TOUCH_STOP) {
+				world.destroyJoint(mouseJoint);
+				mouseJoint = null;
+				return false;
+			} else {
+				mouseJoint.setTarget(touchCoordinates);
+			}
 		}
 		return false;
 	}
