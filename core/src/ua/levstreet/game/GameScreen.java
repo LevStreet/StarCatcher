@@ -1,6 +1,7 @@
 package ua.levstreet.game;
 
 import ua.levstreet.game.actor.DebugInfo;
+import ua.levstreet.game.actor.ScoreActor;
 import ua.levstreet.game.actor.StarActor;
 import ua.levstreet.game.actor.TargetActor;
 
@@ -8,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -52,11 +54,14 @@ public class GameScreen extends InputAdapter implements Screen {
 	private long sinceLastStar = System.currentTimeMillis();
 	private DebugInfo debugInfo;
 	private TargetActor targetActor;
+	private ScoreActor scoreActor;
 
 	public GameScreen(StarCatcher starCatcher) {
 		this.starCatcher = starCatcher;
 		stage = new Stage(new FitViewport(WIDTH, HEIGHT));
 		bitmapFont = new BitmapFont();
+		bitmapFont.getRegion().getTexture()
+				.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		bitmapFont.setUseIntegerPositions(false);
 		bitmapFont.setScale(.02f);
 		world = new World(new Vector2(0, 0), true);
@@ -71,6 +76,8 @@ public class GameScreen extends InputAdapter implements Screen {
 		targetActor = new TargetActor(starCatcher.getAssetManager());
 		targetActor.putInWorld(world, WIDTH - 1, HEIGHT / 2);
 		stage.addActor(targetActor);
+		scoreActor = new ScoreActor(bitmapFont);
+		stage.addActor(scoreActor);
 	}
 
 	private void createWalls(float width, float height) {
@@ -82,8 +89,10 @@ public class GameScreen extends InputAdapter implements Screen {
 		ChainShape chainShape = new ChainShape();
 		float offset = .0f;
 		float[] vertices = { 0 + TOUCH_STOP + offset, 0 + offset,
-				width - offset, 0 + offset, width - offset, height - offset,
-				0 + TOUCH_STOP + offset, height - offset,
+				width - offset, 0 + offset, width - offset,
+				height - offset - bitmapFont.getLineHeight(),
+				0 + TOUCH_STOP + offset,
+				height - offset - bitmapFont.getLineHeight(),
 				0 + TOUCH_STOP + offset, 0 + offset };
 		chainShape.createChain(vertices);
 		FixtureDef fixtureDef = new FixtureDef();
@@ -105,6 +114,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		for (Contact contact : contactList) {
 			if (contact.isTouching()
 					&& contact.getFixtureA() == targetActor.getFixture()) {
+				scoreActor.incScore();
 				starPool.free(((StarActor) contact.getFixtureB().getBody()
 						.getUserData()));
 			}
