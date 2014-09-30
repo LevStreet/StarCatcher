@@ -19,9 +19,9 @@ public class StarCatcher extends Game {
 		textureParameter.minFilter = TextureFilter.MipMapLinearLinear;
 		assetManager.load("smiling-gold-star.png", Texture.class,
 				textureParameter);
+		assetManager.load("badlogic.jpg", Texture.class, textureParameter);
 		while (!assetManager.update()) {
-			Gdx.app.log("assetManager.getProgress()",
-					String.valueOf(assetManager.getProgress()));
+//			Gdx.app.log("assetManager.getProgress()",					String.valueOf(assetManager.getProgress()));
 		}
 		setScreen(new GameScreen(this));
 	}

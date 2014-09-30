@@ -27,9 +27,7 @@ public class StarActor extends Actor implements Poolable {
 		texture = assetManager.get("smiling-gold-star.png");
 		setSize(RADIUS * 2, RADIUS * 2);
 		setOrigin(RADIUS, RADIUS);
-
 		addListener(new EventListener() {
-
 			@Override
 			public boolean handle(Event event) {
 				Gdx.app.log("EventListener", event.toString());
@@ -52,6 +50,7 @@ public class StarActor extends Actor implements Poolable {
 		fixtureDef.density = 1f;
 		fixtureDef.friction = 1;
 		body.createFixture(fixtureDef);
+		body.setUserData(this);
 		circleShape.dispose();
 	}
 

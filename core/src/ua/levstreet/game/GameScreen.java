@@ -2,6 +2,7 @@ package ua.levstreet.game;
 
 import ua.levstreet.game.actor.DebugInfo;
 import ua.levstreet.game.actor.StarActor;
+import ua.levstreet.game.actor.TargetActor;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.ChainShape;
+import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.QueryCallback;
@@ -22,6 +24,7 @@ import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -29,7 +32,7 @@ public class GameScreen extends InputAdapter implements Screen {
 	private final int WIDTH = 10;
 	private final float HEIGHT = WIDTH * 1080 / 1920;
 	private final int FLOW_WIDTH = 1;
-	private final int STAR_EVERY = 500000000;
+	private final int STAR_EVERY = 500;
 	private final int TOUCH_STOP = 2;
 	private StarCatcher starCatcher;
 	private Stage stage;
@@ -46,8 +49,9 @@ public class GameScreen extends InputAdapter implements Screen {
 	private MouseJointDef mouseJointDef;
 	private MouseJoint mouseJoint;
 	private Vector2 touchCoordinates = new Vector2();
-	private long sinceLastStar = System.nanoTime();
+	private long sinceLastStar = System.currentTimeMillis();
 	private DebugInfo debugInfo;
+	private TargetActor targetActor;
 
 	public GameScreen(StarCatcher starCatcher) {
 		this.starCatcher = starCatcher;
@@ -64,6 +68,9 @@ public class GameScreen extends InputAdapter implements Screen {
 		mouseJointDef.collideConnected = false;
 		debugInfo = new DebugInfo(bitmapFont);
 		stage.getRoot().addActorAt(100500, debugInfo);
+		targetActor = new TargetActor(starCatcher.getAssetManager());
+		targetActor.putInWorld(world, WIDTH - 1, HEIGHT / 2);
+		stage.addActor(targetActor);
 	}
 
 	private void createWalls(float width, float height) {
@@ -93,13 +100,25 @@ public class GameScreen extends InputAdapter implements Screen {
 				centerX, centerY, false);
 	}
 
+	private void checkTarget() {
+		Array<Contact> contactList = world.getContactList();
+		for (Contact contact : contactList) {
+			if (contact.isTouching()
+					&& contact.getFixtureA() == targetActor.getFixture()) {
+				starPool.free(((StarActor) contact.getFixtureB().getBody()
+						.getUserData()));
+			}
+		}
+	}
+
 	@Override
 	public void render(float delta) {
-		if (System.nanoTime() - sinceLastStar > STAR_EVERY) {
+		checkTarget();
+		if (System.currentTimeMillis() - sinceLastStar > STAR_EVERY) {
 			StarActor star = starPool.obtain();
 			putInFlow(star);
 			stage.addActor(star);
-			sinceLastStar = System.nanoTime();
+			sinceLastStar = System.currentTimeMillis();
 		}
 		stage.act(delta);
 		for (Actor actor : stage.getActors()) {
@@ -117,7 +136,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		stage.draw();
-		debugRenderer.render(world, stage.getCamera().combined);
+		// debugRenderer.render(world, stage.getCamera().combined);
 		world.step(Gdx.graphics.getDeltaTime(), 8, 3); // TODO
 	}
 
