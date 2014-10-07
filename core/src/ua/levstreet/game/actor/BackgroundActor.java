@@ -5,18 +5,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-public class BackGroundActor extends Actor {
+public class BackgroundActor extends Actor {
 	private Texture texture;
 	
 	
-	public BackGroundActor(AssetManager assetManager,int width,float height){
-		texture = assetManager.get("background1.png");
-		setSize(width,height);
+	public BackgroundActor(AssetManager assetManager){
+		texture = assetManager.get("background1.jpg");
 	}
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		batch.draw(texture,0,0,(float)getWidth(),(float)getHeight());
+		batch.draw(texture,0,0,getStage().getWidth(),getStage().getHeight());
 	}
 
 }

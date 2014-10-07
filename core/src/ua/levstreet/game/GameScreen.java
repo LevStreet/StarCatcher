@@ -1,6 +1,6 @@
 package ua.levstreet.game;
 
-import ua.levstreet.game.actor.BackGroundActor;
+import ua.levstreet.game.actor.BackgroundActor;
 import ua.levstreet.game.actor.DebugInfo;
 import ua.levstreet.game.actor.ScoreActor;
 import ua.levstreet.game.actor.StarActor;
@@ -72,7 +72,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		mouseJointDef.bodyA = walls;
 		mouseJointDef.maxForce = 100500;
 		mouseJointDef.collideConnected = false;
-		stage.addActor(new BackGroundActor(starCatcher.getAssetManager(),WIDTH,HEIGHT));
+		stage.addActor(new BackgroundActor(starCatcher.getAssetManager()));
 		debugInfo = new DebugInfo(bitmapFont);
 		stage.getRoot().addActorAt(100500, debugInfo);
 	
