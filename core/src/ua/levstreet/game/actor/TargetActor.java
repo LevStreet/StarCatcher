@@ -18,7 +18,7 @@ public class TargetActor extends Actor {
 	private Fixture fixture;
 
 	public TargetActor(AssetManager assetManager) {
-		texture = assetManager.get("badlogic.jpg");
+		texture = assetManager.get("blackhole.png");
 		setSize(RADIUS * 2, RADIUS * 2);
 		setOrigin(RADIUS, RADIUS);
 	}
