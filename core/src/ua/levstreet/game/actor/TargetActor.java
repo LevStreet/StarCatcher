@@ -16,9 +16,10 @@ public class TargetActor extends Actor {
 	private Texture texture;
 	private Body body;
 	private Fixture fixture;
+	private float angle;
 
 	public TargetActor(AssetManager assetManager) {
-		texture = assetManager.get("blackhole.png");
+		texture = assetManager.get("blackhole4.png");
 		setSize(RADIUS * 2, RADIUS * 2);
 		setOrigin(RADIUS, RADIUS);
 	}
@@ -44,6 +45,16 @@ public class TargetActor extends Actor {
 				getWidth(), getHeight(), getScaleX(), getScaleY(),
 				getRotation(), 0, 0, texture.getWidth(), texture.getHeight(),
 				false, false);
+	}
+	
+	@Override
+	public void act(float delta) {
+		if (angle<360){
+			angle+=delta*100;
+		}else{
+			angle-=359;
+		}
+		setRotation(angle);
 	}
 
 	public Fixture getFixture() {
