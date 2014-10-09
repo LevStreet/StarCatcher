@@ -16,7 +16,6 @@ public class TargetActor extends Actor {
 	private Texture texture;
 	private Body body;
 	private Fixture fixture;
-	private final int SPEED = 100;
 
 	public TargetActor(AssetManager assetManager) {
 		texture = assetManager.get("blackhole4.png");
@@ -46,10 +45,11 @@ public class TargetActor extends Actor {
 				getRotation(), 0, 0, texture.getWidth(), texture.getHeight(),
 				false, false);
 	}
-	
+
 	@Override
 	public void act(float delta) {
-		rotateBy(delta*SPEED);
+		super.act(delta);
+		body.setTransform(getCenterX(), getCenterY(), 0);
 	}
 
 	public Fixture getFixture() {

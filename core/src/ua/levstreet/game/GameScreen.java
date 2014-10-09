@@ -2,6 +2,7 @@ package ua.levstreet.game;
 
 import ua.levstreet.game.actor.BackgroundActor;
 import ua.levstreet.game.actor.DebugInfo;
+import ua.levstreet.game.actor.ObstacleActor;
 import ua.levstreet.game.actor.ScoreActor;
 import ua.levstreet.game.actor.StarActor;
 import ua.levstreet.game.actor.TargetActor;
@@ -27,6 +28,7 @@ import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -75,14 +77,16 @@ public class GameScreen extends InputAdapter implements Screen {
 		stage.addActor(new BackgroundActor(starCatcher.getAssetManager()));
 		debugInfo = new DebugInfo(bitmapFont);
 		stage.getRoot().addActorAt(100500, debugInfo);
-	
+
 		targetActor = new TargetActor(starCatcher.getAssetManager());
 		targetActor.putInWorld(world, WIDTH - 1, HEIGHT / 2);
+		targetActor.addAction(Actions.parallel(Actions.forever(Actions
+				.rotateBy(10)), Actions.forever(Actions.sequence(
+				Actions.moveBy(0, 1.5f, 5), Actions.moveBy(0, -1.5f, 5)))));
 		stage.addActor(targetActor);
 		scoreActor = new ScoreActor(bitmapFont);
 		stage.addActor(scoreActor);
-		
-		
+		new ObstacleActor(world);
 	}
 
 	private void createWalls(float width, float height) {
@@ -97,8 +101,7 @@ public class GameScreen extends InputAdapter implements Screen {
 				width - offset, 0 + offset, width - offset,
 				height - offset - bitmapFont.getLineHeight(),
 				0 + TOUCH_STOP + offset,
-				height - offset - bitmapFont.getLineHeight(),
-				0 + TOUCH_STOP + offset, 0 + offset };
+				height - offset - bitmapFont.getLineHeight() };
 		chainShape.createChain(vertices);
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = chainShape;
@@ -151,7 +154,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		stage.draw();
-		// debugRenderer.render(world, stage.getCamera().combined);
+		debugRenderer.render(world, stage.getCamera().combined);
 		world.step(Gdx.graphics.getDeltaTime(), 8, 3); // TODO
 	}
 
