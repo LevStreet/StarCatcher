@@ -16,7 +16,7 @@ public class TargetActor extends Actor {
 	private Texture texture;
 	private Body body;
 	private Fixture fixture;
-	private float angle;
+	private final int SPEED = 100;
 
 	public TargetActor(AssetManager assetManager) {
 		texture = assetManager.get("blackhole4.png");
@@ -49,12 +49,7 @@ public class TargetActor extends Actor {
 	
 	@Override
 	public void act(float delta) {
-		if (angle<360){
-			angle+=delta*100;
-		}else{
-			angle-=359;
-		}
-		setRotation(angle);
+		rotateBy(delta*SPEED);
 	}
 
 	public Fixture getFixture() {
