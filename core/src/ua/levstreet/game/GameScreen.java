@@ -2,7 +2,6 @@ package ua.levstreet.game;
 
 import ua.levstreet.game.actor.BackgroundActor;
 import ua.levstreet.game.actor.DebugInfo;
-import ua.levstreet.game.actor.ObstacleActor;
 import ua.levstreet.game.actor.ScoreActor;
 import ua.levstreet.game.actor.StarActor;
 import ua.levstreet.game.actor.TargetActor;
@@ -36,7 +35,7 @@ public class GameScreen extends InputAdapter implements Screen {
 	private final int WIDTH = 10;
 	private final float HEIGHT = WIDTH * 9 / 16;
 	private final int FLOW_WIDTH = 1;
-	private final int STAR_EVERY = 500;
+	private final int STAR_EVERY = 5000;
 	private final int TOUCH_STOP = 2;
 	private StarCatcher starCatcher;
 	private Stage stage;
@@ -61,11 +60,11 @@ public class GameScreen extends InputAdapter implements Screen {
 	public GameScreen(StarCatcher starCatcher) {
 		this.starCatcher = starCatcher;
 		stage = new Stage(new FitViewport(WIDTH, HEIGHT));
-		bitmapFont = new BitmapFont();
+		bitmapFont = starCatcher.getAssetManager().get("font/Consolas.fnt");
 		bitmapFont.getRegion().getTexture()
 				.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		bitmapFont.setUseIntegerPositions(false);
-		bitmapFont.setScale(.02f);
+		bitmapFont.setScale(.01f);
 		world = new World(new Vector2(0, 0), true);
 		debugRenderer = new Box2DDebugRenderer();
 		createWalls(WIDTH, HEIGHT);
@@ -85,7 +84,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		stage.addActor(targetActor);
 		scoreActor = new ScoreActor(bitmapFont);
 		stage.addActor(scoreActor);
-		new ObstacleActor(world, HEIGHT);
+		// new ObstacleActor(world, HEIGHT);
 	}
 
 	private void createWalls(float width, float height) {
@@ -160,7 +159,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		stage.draw();
-		debugRenderer.render(world, stage.getCamera().combined);
+		// debugRenderer.render(world, stage.getCamera().combined);
 		world.step(Gdx.graphics.getDeltaTime(), 8, 3); // TODO
 	}
 
