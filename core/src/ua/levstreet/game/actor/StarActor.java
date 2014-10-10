@@ -1,5 +1,7 @@
 package ua.levstreet.game.actor;
 
+import aurelienribon.bodyeditor.BodyEditorLoader;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,7 +11,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -22,6 +23,8 @@ public class StarActor extends Actor implements Poolable {
 	private Texture texture;
 	private World world;
 	private Body body;
+	private static BodyEditorLoader bodyEditorLoader = new BodyEditorLoader(
+			Gdx.files.internal("star.json"));
 
 	public StarActor(AssetManager assetManager, World world) {
 		texture = assetManager.get("smiling-gold-star.png");
@@ -42,16 +45,12 @@ public class StarActor extends Actor implements Poolable {
 		bodyDef.type = BodyType.DynamicBody;
 		bodyDef.position.set(centerX, centerY);
 		body = world.createBody(bodyDef);
-		CircleShape circleShape = new CircleShape();
-		circleShape.setRadius(RADIUS);
 		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.shape = circleShape;
 		fixtureDef.restitution = .4f;
 		fixtureDef.density = 1f;
 		fixtureDef.friction = 1;
-		body.createFixture(fixtureDef);
+		bodyEditorLoader.attachFixture(body, "Name", fixtureDef, RADIUS * 2);
 		body.setUserData(this);
-		circleShape.dispose();
 	}
 
 	@Override
