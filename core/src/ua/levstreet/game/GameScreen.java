@@ -35,7 +35,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class GameScreen extends InputAdapter implements Screen {
 	private final int WIDTH = 10;
-	private final float HEIGHT = WIDTH * 1080 / 1920;
+	private final float HEIGHT = WIDTH * 9 / 16;
 	private final int FLOW_WIDTH = 1;
 	private final int STAR_EVERY = 500;
 	private final int TOUCH_STOP = 2;
@@ -81,12 +81,12 @@ public class GameScreen extends InputAdapter implements Screen {
 		targetActor = new TargetActor(starCatcher.getAssetManager());
 		targetActor.putInWorld(world, WIDTH - 1, HEIGHT / 2);
 		targetActor.addAction(Actions.parallel(Actions.forever(Actions
-				.rotateBy(10)), Actions.forever(Actions.sequence(
+				.rotateBy(100, 1)), Actions.forever(Actions.sequence(
 				Actions.moveBy(0, 1.5f, 5), Actions.moveBy(0, -1.5f, 5)))));
 		stage.addActor(targetActor);
 		scoreActor = new ScoreActor(bitmapFont);
 		stage.addActor(scoreActor);
-		new ObstacleActor(world);
+		new ObstacleActor(world, HEIGHT);
 	}
 
 	private void createWalls(float width, float height) {
