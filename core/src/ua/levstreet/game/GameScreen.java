@@ -29,7 +29,6 @@ import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -118,13 +117,21 @@ public class GameScreen extends InputAdapter implements Screen {
 	}
 
 	private void checkTarget() {
-		Array<Contact> contactList = world.getContactList();
-		for (Contact contact : contactList) {
-			if (contact.isTouching()
-					&& contact.getFixtureA() == targetActor.getFixture()) {
-				scoreActor.incScore();
-				starPool.free(((StarActor) contact.getFixtureB().getBody()
-						.getUserData()));
+		for (Contact contact : world.getContactList()) {
+			Fixture fixtureA = contact.getFixtureA();
+			Fixture fixtureB = contact.getFixtureB();
+			Fixture target = targetActor.getFixture();
+			if (contact.isTouching()) {
+				Fixture fixture = null;
+				if (fixtureA == target) {
+					fixture = fixtureB;
+				} else if (fixtureB == target) {
+					fixture = fixtureA;
+				}
+				if (fixture != null) {
+					scoreActor.incScore();
+					starPool.free(((StarActor) fixtureA.getBody().getUserData()));
+				}
 			}
 		}
 	}
@@ -146,7 +153,6 @@ public class GameScreen extends InputAdapter implements Screen {
 				if ((star.getRight() < 0 || star.getX() > WIDTH
 						|| star.getTop() < 0 || star.getY() > HEIGHT)
 						&& star.getBody() != bodyB) {
-					stage.getRoot().removeActor(actor);
 					starPool.free(star);
 				}
 			}
