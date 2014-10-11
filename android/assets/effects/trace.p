@@ -58,15 +58,13 @@ timeline0: 0.0
 - Scale - 
 lowMin: 0.1
 lowMax: 0.1
-highMin: 0.01
-highMax: 0.01
+highMin: 0.05
+highMax: 0.05
 relative: false
-scalingCount: 2
+scalingCount: 1
 scaling0: 1.0
-scaling1: 0.0
-timelineCount: 2
+timelineCount: 1
 timeline0: 0.0
-timeline1: 1.0
 - Velocity - 
 active: false
 - Angle - 

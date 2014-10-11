@@ -35,7 +35,7 @@ public class GameScreen extends InputAdapter implements Screen {
 	private final int WIDTH = 10;
 	private final float HEIGHT = WIDTH * 9 / 16;
 	private final int FLOW_WIDTH = 1;
-	private final int STAR_EVERY = 5000;
+	private final int STAR_EVERY = 1000;
 	private final int TOUCH_STOP = 2;
 	private StarCatcher starCatcher;
 	private Stage stage;
@@ -64,7 +64,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		bitmapFont.getRegion().getTexture()
 				.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		bitmapFont.setUseIntegerPositions(false);
-		bitmapFont.setScale(.01f);
+		bitmapFont.setScale(.005f);
 		world = new World(new Vector2(0, 0), true);
 		debugRenderer = new Box2DDebugRenderer();
 		createWalls(WIDTH, HEIGHT);
@@ -100,7 +100,7 @@ public class GameScreen extends InputAdapter implements Screen {
 				height - offset - bitmapFont.getLineHeight(),
 				0 + TOUCH_STOP + offset,
 				height - offset - bitmapFont.getLineHeight() };
-		chainShape.createChain(vertices);
+		chainShape.createLoop(vertices);
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = chainShape;
 		walls.createFixture(fixtureDef);
@@ -128,10 +128,30 @@ public class GameScreen extends InputAdapter implements Screen {
 					fixture = fixtureA;
 				}
 				if (fixture != null) {
+					StarActor star = (StarActor) fixture.getBody()
+							.getUserData();
+					// if (star.isKilled()) {
 					scoreActor.incScore();
-					starPool.free(((StarActor) fixtureA.getBody().getUserData()));
+					star.kill();
+					// }
 				}
 			}
+		}
+	}
+
+	private void killEscaped(StarActor star) {
+		Body bodyB = mouseJointDef.bodyB;
+		if ((star.getRight() < 0 || star.getX() > WIDTH || star.getTop() < 0 || star
+				.getY() > HEIGHT)
+				&& star.getBody() != bodyB
+				&& !star.isKilled()) {
+			star.kill();
+		}
+	}
+
+	private void gatherDead(StarActor star) {
+		if (star.isDead()) {
+			starPool.free(star);
 		}
 	}
 
@@ -148,12 +168,8 @@ public class GameScreen extends InputAdapter implements Screen {
 		for (Actor actor : stage.getActors()) {
 			if (StarActor.class.isInstance(actor)) {
 				StarActor star = (StarActor) actor;
-				Body bodyB = mouseJointDef.bodyB;
-				if ((star.getRight() < 0 || star.getX() > WIDTH
-						|| star.getTop() < 0 || star.getY() > HEIGHT)
-						&& star.getBody() != bodyB) {
-					starPool.free(star);
-				}
+				killEscaped(star);
+				gatherDead(star);
 			}
 		}
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
@@ -221,9 +237,10 @@ public class GameScreen extends InputAdapter implements Screen {
 		touchCoordinates.y = screenY;
 		stage.screenToStageCoordinates(touchCoordinates);
 		if (mouseJoint != null) {
-			if (mouseJointDef.bodyB.getPosition().x > TOUCH_STOP) {
+			if (mouseJointDef.bodyB.getPosition().x > TOUCH_STOP + .5f) {
 				world.destroyJoint(mouseJoint);
 				mouseJoint = null;
+				mouseJointDef.bodyB = null;
 				return false;
 			} else {
 				mouseJoint.setTarget(touchCoordinates);

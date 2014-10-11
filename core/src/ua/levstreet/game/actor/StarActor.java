@@ -7,6 +7,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -29,6 +30,7 @@ public class StarActor extends Actor implements Poolable {
 	private ParticleEffect particleEffect;
 	private float prevX;
 	private float prevY;
+	private boolean killed;
 
 	public StarActor(AssetManager assetManager, World world) {
 		texture = assetManager.<Texture> get("smiling-gold-star.png");
@@ -43,8 +45,6 @@ public class StarActor extends Actor implements Poolable {
 				return false;
 			}
 		});
-		prevX = getCenterX();
-		prevY = getCenterY();
 	}
 
 	public void putInWorld(World world, float centerX, float centerY) {
@@ -59,43 +59,68 @@ public class StarActor extends Actor implements Poolable {
 		fixtureDef.friction = 1;
 		bodyEditorLoader.attachFixture(body, "Name", fixtureDef, RADIUS * 2);
 		body.setUserData(this);
+		prevX = centerX;
+		prevY = centerY;
 	}
 
 	@Override
 	public void act(float delta) {
-		Vector2 position = body.getPosition();
-		setCenterPosition(position.x, position.y);
-		setRotation(body.getAngle() * MathUtils.radiansToDegrees);
-		float interpol = body.getLinearVelocity().len() * 50;
-		particleEffect.getEmitters().get(0).getEmission().setHigh(interpol);
-		float deltaX = getCenterX() - prevX;
-		float deltaY = getCenterY() - prevY;
-		for (int i = 0; i < interpol; i++) {
-			particleEffect.setPosition(prevX + deltaX * i / interpol, prevY
-					+ deltaY * i / interpol);
-			particleEffect.update(delta / interpol);
+		if (!killed) {
+			Vector2 position = body.getPosition();
+			setCenterPosition(position.x, position.y);
+			setRotation(body.getAngle() * MathUtils.radiansToDegrees);
+			float interpol = body.getLinearVelocity().len() * 1;
+			ParticleEmitter particleEmitter = particleEffect.getEmitters().get(
+					0);
+			particleEmitter.getEmission().setHigh(interpol * 100);
+			float deltaX = getCenterX() - prevX;
+			float deltaY = getCenterY() - prevY;
+			for (int i = 0; i < interpol; i++) {
+				float alpha = i / interpol;
+				particleEffect.setPosition(prevX + deltaX * alpha, prevY
+						+ deltaY * alpha);
+				particleEffect.update(Math.max(delta / interpol, .0011f));
+			}
+			prevX = getCenterX();
+			prevY = getCenterY();
+		} else {
+			particleEffect.update(delta);
 		}
-		Gdx.app.log("emi", particleEffect.getEmitters().get(0).getActiveCount() + "");
-		prevX = getCenterX();
-		prevY = getCenterY();
 	}
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		particleEffect.draw(batch);
-		batch.draw(texture, getX(), getY(), getOriginX(), getOriginY(),
-				getWidth(), getHeight(), getScaleX(), getScaleY(),
-				getRotation(), 0, 0, texture.getWidth(), texture.getHeight(),
-				false, false);
+		if (!killed) {
+			batch.draw(texture, getX(), getY(), getOriginX(), getOriginY(),
+					getWidth(), getHeight(), getScaleX(), getScaleY(),
+					getRotation(), 0, 0, texture.getWidth(),
+					texture.getHeight(), false, false);
+		}
 	}
 
 	public Body getBody() {
 		return body;
 	}
 
+	public void kill() {
+		killed = true;
+		world.destroyBody(body);
+		particleEffect.allowCompletion();
+	}
+
+	public boolean isKilled() {
+		return killed;
+	}
+
+	public boolean isDead() {
+		return killed && particleEffect.isComplete();
+	}
+
 	@Override
 	public void reset() {
-		world.destroyBody(body);
 		remove();
+		killed = false;
+		particleEffect.reset();
 	}
 }
