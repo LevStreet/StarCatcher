@@ -4,10 +4,11 @@ import aurelienribon.bodyeditor.BodyEditorLoader;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -22,7 +23,7 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 
 public class StarActor extends Actor implements Poolable {
 	private static float RADIUS = .25f;
-	private Texture texture;
+	private AtlasRegion atlasRegion;
 	private World world;
 	private Body body;
 	private static BodyEditorLoader bodyEditorLoader = new BodyEditorLoader(
@@ -33,9 +34,11 @@ public class StarActor extends Actor implements Poolable {
 	private boolean killed;
 
 	public StarActor(AssetManager assetManager, World world) {
-		texture = assetManager.<Texture> get("smiling-gold-star.png");
-		particleEffect = new ParticleEffect(
-				assetManager.<ParticleEffect> get("effects/trace.p"));
+		atlasRegion = assetManager
+				.get("atlas/common.atlas", TextureAtlas.class).findRegion(
+						"smiling-gold-star");
+		particleEffect = new ParticleEffect(assetManager.get("effects/trace.p",
+				ParticleEffect.class));
 		setSize(RADIUS * 2, RADIUS * 2);
 		setOrigin(RADIUS, RADIUS);
 		addListener(new EventListener() {
@@ -70,8 +73,8 @@ public class StarActor extends Actor implements Poolable {
 			setCenterPosition(position.x, position.y);
 			setRotation(body.getAngle() * MathUtils.radiansToDegrees);
 			float interpol = body.getLinearVelocity().len() * 1;
-			ParticleEmitter particleEmitter = particleEffect.getEmitters().get(
-					0);
+			ParticleEmitter particleEmitter = particleEffect.getEmitters()
+					.first();
 			particleEmitter.getEmission().setHigh(interpol * 100);
 			float deltaX = getCenterX() - prevX;
 			float deltaY = getCenterY() - prevY;
@@ -92,10 +95,9 @@ public class StarActor extends Actor implements Poolable {
 	public void draw(Batch batch, float parentAlpha) {
 		particleEffect.draw(batch);
 		if (!killed) {
-			batch.draw(texture, getX(), getY(), getOriginX(), getOriginY(),
+			batch.draw(atlasRegion, getX(), getY(), getOriginX(), getOriginY(),
 					getWidth(), getHeight(), getScaleX(), getScaleY(),
-					getRotation(), 0, 0, texture.getWidth(),
-					texture.getHeight(), false, false);
+					getRotation());
 		}
 	}
 

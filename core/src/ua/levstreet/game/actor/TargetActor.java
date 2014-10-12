@@ -1,8 +1,9 @@
 package ua.levstreet.game.actor;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -13,12 +14,14 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class TargetActor extends Actor {
 	private static float RADIUS = .5f;
-	private Texture texture;
+	private AtlasRegion atlasRegion;
 	private Body body;
 	private Fixture fixture;
 
 	public TargetActor(AssetManager assetManager) {
-		texture = assetManager.get("blackhole4.png");
+		atlasRegion = assetManager
+				.get("atlas/common.atlas", TextureAtlas.class).findRegion(
+						"blackhole4");
 		setSize(RADIUS * 2, RADIUS * 2);
 		setOrigin(RADIUS, RADIUS);
 	}
@@ -40,10 +43,9 @@ public class TargetActor extends Actor {
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		batch.draw(texture, getX(), getY(), getOriginX(), getOriginY(),
+		batch.draw(atlasRegion, getX(), getY(), getOriginX(), getOriginY(),
 				getWidth(), getHeight(), getScaleX(), getScaleY(),
-				getRotation(), 0, 0, texture.getWidth(), texture.getHeight(),
-				false, false);
+				getRotation());
 	}
 
 	@Override

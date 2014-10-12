@@ -6,7 +6,7 @@ lowMin: 0.0
 lowMax: 0.0
 - Count - 
 min: 0
-max: 99999
+max: 1000
 - Emission - 
 lowMin: 0.0
 lowMax: 0.0
@@ -98,7 +98,7 @@ timeline1: 1.0
 attached: false
 continuous: true
 aligned: false
-additive: true
+additive: false
 behind: false
 premultipliedAlpha: false
 - Image Path -

@@ -1,0 +1,41 @@
+
+common.png
+size: 1956,2041
+format: RGBA8888
+filter: MipMapLinearLinear,Linear
+repeat: none
+Consolas
+  rotate: false
+  xy: 704, 447
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+background1
+  rotate: false
+  xy: 2, 961
+  size: 1920, 1080
+  orig: 1920, 1080
+  offset: 0, 0
+  index: -1
+blackhole4
+  rotate: false
+  xy: 2, 2
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+particle
+  rotate: false
+  xy: 1924, 2009
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+smiling-gold-star
+  rotate: false
+  xy: 2, 260
+  size: 700, 699
+  orig: 700, 699
+  offset: 0, 0
+  index: -1

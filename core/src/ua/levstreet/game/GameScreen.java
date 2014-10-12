@@ -10,8 +10,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -60,34 +61,38 @@ public class GameScreen extends InputAdapter implements Screen {
 	public GameScreen(StarCatcher starCatcher) {
 		this.starCatcher = starCatcher;
 		stage = new Stage(new FitViewport(WIDTH, HEIGHT));
-		bitmapFont = starCatcher.getAssetManager().get("font/Consolas.fnt");
-		bitmapFont.getRegion().getTexture()
-				.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		stage.addActor(new BackgroundActor(starCatcher.getAssetManager()));
+		// bitmapFont = starCatcher.getAssetManager().get("font/Consolas.fnt");
+		bitmapFont = new BitmapFont(Gdx.files.internal("font/Consolas.fnt"),
+				starCatcher.getAssetManager()
+						.get("atlas/common.atlas", TextureAtlas.class)
+						.findRegion("Consolas"));
 		bitmapFont.setUseIntegerPositions(false);
-		bitmapFont.setScale(.005f);
+		bitmapFont.setScale(.0075f);
+		bitmapFont.setColor(1, 0, 0, 1);
+		scoreActor = new ScoreActor(bitmapFont);
+		stage.addActor(scoreActor);
+		debugInfo = new DebugInfo(bitmapFont);
+		stage.getRoot().addActorAt(100500, debugInfo);
 		world = new World(new Vector2(0, 0), true);
 		debugRenderer = new Box2DDebugRenderer();
-		createWalls(WIDTH, HEIGHT);
+		createWalls(TOUCH_STOP, WIDTH, HEIGHT);
 		mouseJointDef = new MouseJointDef();
 		mouseJointDef.bodyA = walls;
 		mouseJointDef.maxForce = 100500;
 		mouseJointDef.collideConnected = false;
-		stage.addActor(new BackgroundActor(starCatcher.getAssetManager()));
-		debugInfo = new DebugInfo(bitmapFont);
-		stage.getRoot().addActorAt(100500, debugInfo);
-
 		targetActor = new TargetActor(starCatcher.getAssetManager());
 		targetActor.putInWorld(world, WIDTH - 1, HEIGHT / 2);
 		targetActor.addAction(Actions.parallel(Actions.forever(Actions
 				.rotateBy(100, 1)), Actions.forever(Actions.sequence(
 				Actions.moveBy(0, 1.5f, 5), Actions.moveBy(0, -1.5f, 5)))));
 		stage.addActor(targetActor);
-		scoreActor = new ScoreActor(bitmapFont);
-		stage.addActor(scoreActor);
 		// new ObstacleActor(world, HEIGHT);
+		stage.addAction(Actions.sequence(Actions.moveBy(0, HEIGHT),
+				Actions.moveTo(0, 0, 1, Interpolation.bounceOut)));
 	}
 
-	private void createWalls(float width, float height) {
+	private void createWalls(float x, float width, float height) {
 		if (walls != null) {
 			world.destroyBody(walls);
 		}
@@ -95,10 +100,9 @@ public class GameScreen extends InputAdapter implements Screen {
 		walls = world.createBody(bodyDef);
 		ChainShape chainShape = new ChainShape();
 		float offset = .0f;
-		float[] vertices = { 0 + TOUCH_STOP + offset, 0 + offset,
-				width - offset, 0 + offset, width - offset,
-				height - offset - bitmapFont.getLineHeight(),
-				0 + TOUCH_STOP + offset,
+		float[] vertices = { x + offset, 0 + offset, width - offset,
+				0 + offset, width - offset,
+				height - offset - bitmapFont.getLineHeight(), x + offset,
 				height - offset - bitmapFont.getLineHeight() };
 		chainShape.createLoop(vertices);
 		FixtureDef fixtureDef = new FixtureDef();
@@ -111,8 +115,9 @@ public class GameScreen extends InputAdapter implements Screen {
 		float centerX = MathUtils.random(0.f, FLOW_WIDTH) + star.getWidth() / 2;
 		float centerY = HEIGHT + star.getHeight() / 2;
 		star.putInWorld(world, centerX, centerY);
+		Vector2 center = star.getBody().getWorldCenter();
 		star.getBody().applyLinearImpulse(0, -MathUtils.random(.1f, .5f),
-				centerX, centerY, false);
+				center.x, center.y, false);
 	}
 
 	private void checkTarget() {
