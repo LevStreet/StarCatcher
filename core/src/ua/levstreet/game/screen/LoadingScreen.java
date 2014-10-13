@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 public class LoadingScreen extends ScreenAdapter {
 	private StarCatcher starCatcher;
 	private ShapeRenderer shapeRenderer;
-	private int width;
 
 	public LoadingScreen(StarCatcher starCatcher) {
 		this.starCatcher = starCatcher;
@@ -23,20 +22,21 @@ public class LoadingScreen extends ScreenAdapter {
 			starCatcher.setScreen(new GameScreen(starCatcher));
 			return;
 		}
-		float progress = assetManager.getProgress() * width;
+		float progress = assetManager.getProgress();
 		shapeRenderer.begin(ShapeType.Filled);
-		shapeRenderer.rect(0, 100, progress, 200);
+		shapeRenderer.setColor(0, 0, 0.2f, 1);
+		shapeRenderer.rect(0, 0, progress, 1);
 		shapeRenderer.end();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		this.width = width;
 	}
 
 	@Override
 	public void show() {
 		shapeRenderer = new ShapeRenderer();
+		shapeRenderer.getProjectionMatrix().setToOrtho2D(0, 0, 1, 1);
 	}
 
 	@Override
