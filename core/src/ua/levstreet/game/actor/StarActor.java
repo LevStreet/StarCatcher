@@ -26,8 +26,7 @@ public class StarActor extends Actor implements Poolable {
 	private AtlasRegion atlasRegion;
 	private World world;
 	private Body body;
-	private static BodyEditorLoader bodyEditorLoader = new BodyEditorLoader(
-			Gdx.files.internal("star.json"));
+	private BodyEditorLoader bodyEditorLoader;
 	private ParticleEffect particleEffect;
 	private float prevX;
 	private float prevY;
@@ -39,6 +38,8 @@ public class StarActor extends Actor implements Poolable {
 						"smiling-gold-star");
 		particleEffect = new ParticleEffect(assetManager.get("effects/trace.p",
 				ParticleEffect.class));
+		bodyEditorLoader = assetManager.get("star.json",
+				BodyEditorLoader.class);
 		setSize(RADIUS * 2, RADIUS * 2);
 		setOrigin(RADIUS, RADIUS);
 		addListener(new EventListener() {

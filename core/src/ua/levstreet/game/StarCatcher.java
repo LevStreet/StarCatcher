@@ -2,6 +2,8 @@ package ua.levstreet.game;
 
 import ua.levstreet.game.screen.LoadingScreen;
 
+import aurelienribon.bodyeditor.BodyEditorLoader;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.ParticleEffectLoader.ParticleEffectParameter;
@@ -24,6 +26,11 @@ public class StarCatcher extends Game {
 		particleEffectParameter.atlasFile = "atlas/common.atlas";
 		assetManager.load("effects/trace.p", ParticleEffect.class,
 				particleEffectParameter);
+
+		assetManager.setLoader(BodyEditorLoader.class,
+				new BodyEditorLoaderLoader());
+		assetManager.load("star.json", BodyEditorLoader.class);
+		assetManager.load("leveltest.json", BodyEditorLoader.class);
 
 		setScreen(new LoadingScreen(this));
 	}
