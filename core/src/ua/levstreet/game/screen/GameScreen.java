@@ -1,5 +1,6 @@
-package ua.levstreet.game;
+package ua.levstreet.game.screen;
 
+import ua.levstreet.game.StarCatcher;
 import ua.levstreet.game.actor.BackgroundActor;
 import ua.levstreet.game.actor.DebugInfo;
 import ua.levstreet.game.actor.ScoreActor;
