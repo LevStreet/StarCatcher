@@ -45,7 +45,7 @@ public class GameScreen extends InputAdapter implements Screen {
 	private World world;
 	private Box2DDebugRenderer debugRenderer;
 	private Body walls;
-	private Pool<StarActor> starPool = new Pool<StarActor>() {
+	private Pool<StarActor> starPool = new Pool<StarActor>(1) {
 		@Override
 		protected StarActor newObject() {
 			return new StarActor(starCatcher.getAssetManager(), world);
@@ -109,6 +109,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		chainShape.createLoop(vertices);
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = chainShape;
+		fixtureDef.filter.categoryBits = 2;
 		wallFixture = walls.createFixture(fixtureDef);
 		chainShape.dispose();
 	}
@@ -117,6 +118,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		float centerX = MathUtils.random(0.f, FLOW_WIDTH) + star.getWidth() / 2;
 		float centerY = HEIGHT + star.getHeight() / 2;
 		star.putInWorld(world, centerX, centerY);
+		star.setMaskBits((short) -3);
 		Vector2 center = star.getBody().getWorldCenter();
 		star.getBody().applyLinearImpulse(0, -MathUtils.random(.1f, .5f),
 				center.x, center.y, false);
@@ -162,6 +164,14 @@ public class GameScreen extends InputAdapter implements Screen {
 		}
 	}
 
+	private void leaveFlow(StarActor starActor) {
+		Body body = starActor.getBody();
+		if (starActor.getX() > TOUCH_STOP && body != mouseJointDef.bodyB
+				&& !starActor.isKilled()) {
+			starActor.setMaskBits((short) -1);
+		}
+	}
+
 	@Override
 	public void render(float delta) {
 		checkTarget();
@@ -176,14 +186,15 @@ public class GameScreen extends InputAdapter implements Screen {
 			if (StarActor.class.isInstance(actor)) {
 				StarActor star = (StarActor) actor;
 				killEscaped(star);
-				gatherDead(star);
+				leaveFlow(star);
+				gatherDead(star); // Whoa! deletion inside cycle
 			}
 		}
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		stage.draw();
-		// debugRenderer.render(world, stage.getCamera().combined);
-		world.step(Gdx.graphics.getDeltaTime(), 8, 3); // TODO
+		debugRenderer.render(world, stage.getCamera().combined);
+		world.step(delta, 8, 3); // TODO
 	}
 
 	@Override
@@ -238,6 +249,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		if (mouseJoint != null) {
 			world.destroyJoint(mouseJoint);
 			mouseJoint = null;
+			mouseJointDef.bodyB = null;
 		}
 		return false;
 	}
@@ -247,7 +259,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		touchCoordinates.y = screenY;
 		stage.screenToStageCoordinates(touchCoordinates);
 		if (mouseJoint != null) {
-			if (mouseJointDef.bodyB.getPosition().x > TOUCH_STOP + .5f) {
+			if (((StarActor) mouseJointDef.bodyB.getUserData()).getX() > TOUCH_STOP) {
 				world.destroyJoint(mouseJoint);
 				mouseJoint = null;
 				mouseJointDef.bodyB = null;
