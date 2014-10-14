@@ -38,8 +38,8 @@ public class StarActor extends Actor implements Poolable {
 						"smiling-gold-star");
 		particleEffect = new ParticleEffect(assetManager.get("effects/trace.p",
 				ParticleEffect.class));
-		bodyEditorLoader = assetManager.get("star.json",
-				BodyEditorLoader.class);
+		bodyEditorLoader = assetManager
+				.get("star.json", BodyEditorLoader.class);
 		setSize(RADIUS * 2, RADIUS * 2);
 		setOrigin(RADIUS, RADIUS);
 		addListener(new EventListener() {
@@ -73,18 +73,18 @@ public class StarActor extends Actor implements Poolable {
 			Vector2 position = body.getPosition();
 			setCenterPosition(position.x, position.y);
 			setRotation(body.getAngle() * MathUtils.radiansToDegrees);
-			float interpol = body.getLinearVelocity().len() * 1;
+			float interpol = Math.min(body.getLinearVelocity().len() * 1, 50);
 			ParticleEmitter particleEmitter = particleEffect.getEmitters()
 					.first();
-			particleEmitter.getEmission().setHigh(interpol * 100);
 			float deltaX = getCenterX() - prevX;
 			float deltaY = getCenterY() - prevY;
-			for (int i = 0; i < interpol; i++) {
+			for (int i = 0; i < (int) interpol; i++) {
 				float alpha = i / interpol;
 				particleEffect.setPosition(prevX + deltaX * alpha, prevY
 						+ deltaY * alpha);
-				particleEffect.update(Math.max(delta / interpol, .0011f));
+				particleEmitter.addParticle();
 			}
+			particleEffect.update(delta);
 			prevX = getCenterX();
 			prevY = getCenterY();
 		} else {
