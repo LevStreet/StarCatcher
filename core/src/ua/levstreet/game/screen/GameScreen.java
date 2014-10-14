@@ -58,6 +58,7 @@ public class GameScreen extends InputAdapter implements Screen {
 	private DebugInfo debugInfo;
 	private TargetActor targetActor;
 	private ScoreActor scoreActor;
+	private Fixture wallFixture;
 
 	public GameScreen(StarCatcher starCatcher) {
 		this.starCatcher = starCatcher;
@@ -108,7 +109,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		chainShape.createLoop(vertices);
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = chainShape;
-		walls.createFixture(fixtureDef);
+		wallFixture = walls.createFixture(fixtureDef);
 		chainShape.dispose();
 	}
 
@@ -217,6 +218,9 @@ public class GameScreen extends InputAdapter implements Screen {
 		world.QueryAABB(new QueryCallback() {
 			@Override
 			public boolean reportFixture(Fixture fixture) {
+				if (fixture == wallFixture) {
+					return true;
+				}
 				// if (fixture.testPoint(touchCoordinates)) {
 				mouseJointDef.bodyB = fixture.getBody();
 				mouseJointDef.target.set(touchCoordinates);
