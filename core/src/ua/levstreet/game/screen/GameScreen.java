@@ -167,7 +167,7 @@ public class GameScreen extends InputAdapter implements Screen {
 	private void leaveFlow(StarActor starActor) {
 		Body body = starActor.getBody();
 		if (starActor.getX() > TOUCH_STOP && body != mouseJointDef.bodyB
-				&& !starActor.isKilled()) {
+				&& starActor.getMaskBits() != -1) {
 			starActor.setMaskBits((short) -1);
 		}
 	}
@@ -193,7 +193,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		stage.draw();
-		debugRenderer.render(world, stage.getCamera().combined);
+		// debugRenderer.render(world, stage.getCamera().combined);
 		world.step(delta, 8, 3); // TODO
 	}
 

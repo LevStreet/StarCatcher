@@ -13,9 +13,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -33,6 +33,7 @@ public class StarActor extends Actor implements Poolable {
 	private float prevX;
 	private float prevY;
 	private boolean killed;
+	private short maskBits;
 
 	public StarActor(AssetManager assetManager, World world) {
 		atlasRegion = assetManager
@@ -60,7 +61,7 @@ public class StarActor extends Actor implements Poolable {
 		bodyDef.position.set(centerX, centerY);
 		body = world.createBody(bodyDef);
 		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.restitution = .4f;
+		fixtureDef.restitution = .5f;
 		fixtureDef.density = 1f;
 		fixtureDef.friction = 1;
 		bodyEditorLoader.attachFixture(body, "Name", fixtureDef, RADIUS * 2);
@@ -111,6 +112,7 @@ public class StarActor extends Actor implements Poolable {
 	public void kill() {
 		killed = true;
 		world.destroyBody(body);
+		body = null;
 		particleEffect.allowCompletion();
 	}
 
@@ -123,11 +125,16 @@ public class StarActor extends Actor implements Poolable {
 	}
 
 	public void setMaskBits(short maskBits) {
+		this.maskBits = maskBits;
 		for (Fixture fixture : body.getFixtureList()) {
 			Filter filterData = fixture.getFilterData();
 			filterData.maskBits = maskBits;
 			fixture.setFilterData(filterData);
 		}
+	}
+
+	public short getMaskBits() {
+		return maskBits;
 	}
 
 	@Override
