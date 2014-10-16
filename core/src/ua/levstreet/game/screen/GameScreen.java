@@ -3,6 +3,7 @@ package ua.levstreet.game.screen;
 import ua.levstreet.game.StarCatcher;
 import ua.levstreet.game.actor.BackgroundActor;
 import ua.levstreet.game.actor.DebugInfo;
+import ua.levstreet.game.actor.ObstacleActor;
 import ua.levstreet.game.actor.ScoreActor;
 import ua.levstreet.game.actor.StarActor;
 import ua.levstreet.game.actor.TargetActor;
@@ -89,7 +90,11 @@ public class GameScreen extends InputAdapter implements Screen {
 				.rotateBy(100, 1)), Actions.forever(Actions.sequence(
 				Actions.moveBy(0, 1.5f, 5), Actions.moveBy(0, -1.5f, 5)))));
 		stage.addActor(targetActor);
-		// new ObstacleActor(world, HEIGHT);
+		ObstacleActor obstacle = new ObstacleActor(
+				starCatcher.getAssetManager(), world, WIDTH);
+		obstacle.setWidth(WIDTH);
+		obstacle.setHeight(HEIGHT);
+		stage.addActor(obstacle);
 		stage.addAction(Actions.sequence(Actions.moveBy(0, HEIGHT),
 				Actions.moveTo(0, 0, 1, Interpolation.bounceOut)));
 	}

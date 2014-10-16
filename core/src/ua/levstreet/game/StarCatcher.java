@@ -7,6 +7,7 @@ import aurelienribon.bodyeditor.BodyEditorLoader;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.ParticleEffectLoader.ParticleEffectParameter;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 
 public class StarCatcher extends Game {
@@ -30,7 +31,11 @@ public class StarCatcher extends Game {
 		assetManager.setLoader(BodyEditorLoader.class,
 				new BodyEditorLoaderLoader());
 		assetManager.load("star.json", BodyEditorLoader.class);
-		assetManager.load("leveltest.json", BodyEditorLoader.class);
+
+		// Choose level
+
+		assetManager.load("levels/level0.json", BodyEditorLoader.class);
+		assetManager.load("levels/level0.png", Texture.class);
 
 		setScreen(new LoadingScreen(this));
 	}
