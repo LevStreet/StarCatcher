@@ -2,6 +2,7 @@ package ua.levstreet.game.screen;
 
 import ua.levstreet.game.StarCatcher;
 import ua.levstreet.game.actor.BackgroundActor;
+import ua.levstreet.game.actor.BarrierActor;
 import ua.levstreet.game.actor.DebugInfo;
 import ua.levstreet.game.actor.ObstacleActor;
 import ua.levstreet.game.actor.ScoreActor;
@@ -82,6 +83,7 @@ public class GameScreen extends InputAdapter implements Screen {
 
 		stage = new Stage(new FitViewport(WIDTH, HEIGHT));
 		stage.addActor(new BackgroundActor(starCatcher.getAssetManager()));
+	    stage.addActor(new BarrierActor(starCatcher.getAssetManager(),TOUCH_STOP-WIDTH/50f, 0 , WIDTH/50f, HEIGHT));
 		scoreActor = new ScoreActor(bitmapFont);
 		stage.addActor(scoreActor);
 		targetActor = new TargetActor(starCatcher.getAssetManager());

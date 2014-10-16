@@ -36,6 +36,8 @@ public class StarCatcher extends Game {
 
 		assetManager.load("levels/level0.json", BodyEditorLoader.class);
 		assetManager.load("levels/level0.png", Texture.class);
+		
+		assetManager.load("barrier.png", Texture.class);
 
 		setScreen(new LoadingScreen(this));
 	}
