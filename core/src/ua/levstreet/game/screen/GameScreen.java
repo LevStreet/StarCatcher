@@ -63,8 +63,6 @@ public class GameScreen extends InputAdapter implements Screen {
 
 	public GameScreen(StarCatcher starCatcher) {
 		this.starCatcher = starCatcher;
-		stage = new Stage(new FitViewport(WIDTH, HEIGHT));
-		stage.addActor(new BackgroundActor(starCatcher.getAssetManager()));
 		// bitmapFont = starCatcher.getAssetManager().get("font/Consolas.fnt");
 		bitmapFont = new BitmapFont(Gdx.files.internal("font/Consolas.fnt"),
 				starCatcher.getAssetManager()
@@ -73,10 +71,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		bitmapFont.setUseIntegerPositions(false);
 		bitmapFont.setScale(.0075f);
 		bitmapFont.setColor(1, 0, 0, 1);
-		scoreActor = new ScoreActor(bitmapFont);
-		stage.addActor(scoreActor);
-		debugInfo = new DebugInfo(bitmapFont);
-		stage.getRoot().addActorAt(100500, debugInfo);
+
 		world = new World(new Vector2(0, 0), true);
 		debugRenderer = new Box2DDebugRenderer();
 		createWalls(TOUCH_STOP, WIDTH, HEIGHT);
@@ -84,12 +79,19 @@ public class GameScreen extends InputAdapter implements Screen {
 		mouseJointDef.bodyA = walls;
 		mouseJointDef.maxForce = 100500;
 		mouseJointDef.collideConnected = false;
+
+		stage = new Stage(new FitViewport(WIDTH, HEIGHT));
+		stage.addActor(new BackgroundActor(starCatcher.getAssetManager()));
+		scoreActor = new ScoreActor(bitmapFont);
+		stage.addActor(scoreActor);
 		targetActor = new TargetActor(starCatcher.getAssetManager());
 		targetActor.putInWorld(world, WIDTH - 1, HEIGHT / 2);
 		targetActor.addAction(Actions.parallel(Actions.forever(Actions
 				.rotateBy(100, 1)), Actions.forever(Actions.sequence(
 				Actions.moveBy(0, 1.5f, 5), Actions.moveBy(0, -1.5f, 5)))));
 		stage.addActor(targetActor);
+		debugInfo = new DebugInfo(bitmapFont);
+		stage.addActor(debugInfo);
 		ObstacleActor obstacle = new ObstacleActor(
 				starCatcher.getAssetManager(), world, WIDTH);
 		obstacle.setWidth(WIDTH);
@@ -183,7 +185,7 @@ public class GameScreen extends InputAdapter implements Screen {
 		if (System.currentTimeMillis() - sinceLastStar > STAR_EVERY) {
 			StarActor star = starPool.obtain();
 			putInFlow(star);
-			stage.addActor(star);
+			stage.getRoot().addActorAt(4, star);
 			sinceLastStar = System.currentTimeMillis();
 		}
 		stage.act(delta);
